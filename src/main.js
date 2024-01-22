@@ -13,10 +13,7 @@ const loadMoreBtn = document.querySelector(".load-more-btn");
 const loadingText = document.querySelector(".loading-text");
 let savedQuery;
 
-loadMoreBtn.style.display = "none";
-loadingText.style.display = "none";
-
-let ligthBoxModal = new SimpleLightbox(".gallery a", {
+let lightBoxModal = new SimpleLightbox(".gallery a", {
     captionDelay: 250, 
     captionsData: "alt",
 });
@@ -41,10 +38,12 @@ async function fetchImages() {
 
     const response = await axios.get(`https://pixabay.com/api/?${searchParams}`);
     let totalImages = response.data.totalHits;
+
     if (totalImages === 0) {
         return [];
     }
-    if ((page * limit) > totalImages) {
+    
+    if ((page * limit) >= totalImages) {
         isImagesEnded = true;
         iziToast.error({
             position: "topRight",
@@ -84,12 +83,34 @@ function renderImages(hits) {
                 </div>
             </li>`, '');
     galleryRoot.insertAdjacentHTML("beforeend", galleryImages);
-    ligthBoxModal.refresh();
-    ligthBoxModal.on("show.simplelightbox", function () {});
+    lightBoxModal.refresh();
+    lightBoxModal.on("show.simplelightbox", function () {});
+}
+
+function showLoadMoreBtn() {
+    loadMoreBtn.style.display = "block";
+}
+
+function hideLoadMoreBtn() {
+    loadMoreBtn.style.display = "none";
+}
+
+function showLoadingText() {
+    loadingText.style.display = "block";
+}
+
+function hideLoadingText() {
+    loadingText.style.display = "none";
 }
 
 form.addEventListener("submit", async (event) => {
     event.preventDefault();
+
+    // when our previous query show all images
+    // we set isImagesEnded = true
+    // if we make new query without refreshing page - isImagesEnded will be still true, 
+    // thats why we wouldnt see load more button after fetching images by new query
+    // we need set isImagesEnded = false 
 
     isImagesEnded = false;
 
@@ -104,7 +125,7 @@ form.addEventListener("submit", async (event) => {
         page = 1;
     }
 
-    loadingText.style.display = "block";
+    showLoadingText();
 
     try {
         const images = await fetchImages();
@@ -118,26 +139,27 @@ form.addEventListener("submit", async (event) => {
         console.log(error);
     }
 
-    loadingText.style.display = "none";
+    hideLoadingText();
 
-    if(galleryRoot.childNodes.length > 0) {    
-        page += 1;
-        loadMoreBtn.style.display = "block";
-    } else {
-        loadMoreBtn.style.display = "none";
+    if(galleryRoot.childNodes.length === 0) {    
         iziToast.error({
             position: "topRight",
             color: "red",
             message: "Images not found!"
         });
+    } else if(isImagesEnded) {
+        return;
+    } else {
+        page += 1;
+        showLoadMoreBtn();
     }
 });
 
 loadMoreBtn.addEventListener("click", async (event) => {
     event.preventDefault();
 
-    loadMoreBtn.style.display = "none";
-    loadingText.style.display = "block";
+    hideLoadMoreBtn();
+    showLoadingText();
 
     try {
         const response = await fetchImages();
@@ -151,12 +173,11 @@ loadMoreBtn.addEventListener("click", async (event) => {
         });
         console.log(error);
     }
-    
-    loadingText.style.display = "none";
-    if(isImagesEnded) {
-        loadMoreBtn.style.display = "none";
-    } else {
-        loadMoreBtn.style.display = "block";
+
+    hideLoadingText();
+
+    if(!isImagesEnded) {
+        showLoadMoreBtn();
     }
 
     const galleryItemHeight = document.querySelector(".gallery-item").getBoundingClientRect().height;
