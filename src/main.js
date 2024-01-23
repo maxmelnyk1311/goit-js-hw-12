@@ -118,7 +118,7 @@ form.addEventListener("submit", async (event) => {
         galleryRoot.innerHTML = "";
         page = 1;
     }
-    
+
     hideLoadMoreBtn();
     showLoadingText();
 
@@ -137,7 +137,6 @@ form.addEventListener("submit", async (event) => {
     hideLoadingText();
 
     if(galleryRoot.childNodes.length === 0) {    
-        hideLoadMoreBtn();
         iziToast.error({
             position: "topRight",
             color: "red",
