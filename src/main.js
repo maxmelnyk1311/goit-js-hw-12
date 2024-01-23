@@ -20,7 +20,22 @@ let lightBoxModal = new SimpleLightbox(".gallery a", {
 
 let page = 1;
 const limit = 40;
-let isImagesEnded = false;
+
+function showLoadMoreBtn() {
+    loadMoreBtn.style.display = "block";
+}
+
+function hideLoadMoreBtn() {
+    loadMoreBtn.style.display = "none";
+}
+
+function showLoadingText() {
+    loadingText.style.display = "block";
+}
+
+function hideLoadingText() {
+    loadingText.style.display = "none";
+}
 
 async function fetchImages() {
     const searchParams = new URLSearchParams({
@@ -42,14 +57,15 @@ async function fetchImages() {
     if (totalImages === 0) {
         return [];
     }
-    
+
     if ((page * limit) >= totalImages) {
-        isImagesEnded = true;
         iziToast.error({
             position: "topRight",
             color: "red",
             message: "We're sorry, but you've reached the end of search results."
           }); 
+    } else {
+        showLoadMoreBtn();
     }
     return response.data.hits;
 }
@@ -87,32 +103,10 @@ function renderImages(hits) {
     lightBoxModal.on("show.simplelightbox", function () {});
 }
 
-function showLoadMoreBtn() {
-    loadMoreBtn.style.display = "block";
-}
 
-function hideLoadMoreBtn() {
-    loadMoreBtn.style.display = "none";
-}
-
-function showLoadingText() {
-    loadingText.style.display = "block";
-}
-
-function hideLoadingText() {
-    loadingText.style.display = "none";
-}
 
 form.addEventListener("submit", async (event) => {
     event.preventDefault();
-
-    // when our previous query show all images
-    // we set isImagesEnded = true
-    // if we make new query without refreshing page - isImagesEnded will be still true, 
-    // thats why we wouldnt see load more button after fetching images by new query
-    // we need set isImagesEnded = false 
-
-    isImagesEnded = false;
 
     if (input.value.trim().length === 0) {
         return;
@@ -147,11 +141,8 @@ form.addEventListener("submit", async (event) => {
             color: "red",
             message: "Images not found!"
         });
-    } else if(isImagesEnded) {
-        return;
     } else {
         page += 1;
-        showLoadMoreBtn();
     }
 });
 
@@ -175,10 +166,6 @@ loadMoreBtn.addEventListener("click", async (event) => {
     }
 
     hideLoadingText();
-
-    if(!isImagesEnded) {
-        showLoadMoreBtn();
-    }
 
     const galleryItemHeight = document.querySelector(".gallery-item").getBoundingClientRect().height;
     window.scrollBy({
