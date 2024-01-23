@@ -38,7 +38,6 @@ function hideLoadingText() {
 }
 
 async function fetchImages() {
-    hideLoadMoreBtn();
     const searchParams = new URLSearchParams({
         key: "41748300-cb29be2b9e713bfb06ce55aab",
         q: "",
@@ -119,7 +118,8 @@ form.addEventListener("submit", async (event) => {
         galleryRoot.innerHTML = "";
         page = 1;
     }
-
+    
+    hideLoadMoreBtn();
     showLoadingText();
 
     try {
