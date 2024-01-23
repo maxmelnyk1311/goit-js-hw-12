@@ -59,6 +59,7 @@ async function fetchImages() {
     }
 
     if ((page * limit) >= totalImages) {
+        hideLoadMoreBtn();
         iziToast.error({
             position: "topRight",
             color: "red",
