@@ -120,6 +120,7 @@ form.addEventListener("submit", async (event) => {
         page = 1;
     }
 
+    hideLoadMoreBtn();
     showLoadingText();
 
     try {
