@@ -38,6 +38,7 @@ function hideLoadingText() {
 }
 
 async function fetchImages() {
+    hideLoadMoreBtn();
     const searchParams = new URLSearchParams({
         key: "41748300-cb29be2b9e713bfb06ce55aab",
         q: "",
@@ -59,7 +60,6 @@ async function fetchImages() {
     }
 
     if ((page * limit) >= totalImages) {
-        hideLoadMoreBtn();
         iziToast.error({
             position: "topRight",
             color: "red",
@@ -120,7 +120,6 @@ form.addEventListener("submit", async (event) => {
         page = 1;
     }
 
-    hideLoadMoreBtn();
     showLoadingText();
 
     try {
@@ -152,7 +151,6 @@ form.addEventListener("submit", async (event) => {
 loadMoreBtn.addEventListener("click", async (event) => {
     event.preventDefault();
 
-    hideLoadMoreBtn();
     showLoadingText();
 
     try {
